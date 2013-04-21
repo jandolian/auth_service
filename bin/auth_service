@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+;Application = require('../lib/application');
+
+(function() {
+  var application = new Application()
+})()
+
