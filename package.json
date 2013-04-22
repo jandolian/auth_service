@@ -14,7 +14,8 @@
     "pkginfo": "0.2.3",
     "express": "3.2.0",
     "async": "0.2.7",
-    "underscore": "1.4.4"
+    "underscore": "1.4.4",
+    "redis": "0.8.3"
   },
   "devDependencies": {
     "mocha": "1.9.0",
