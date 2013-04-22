@@ -36,6 +36,7 @@ class WebServer
     @app.get '/', version.display
     @app.get '/version', version.display
 
+    @app.get '/user', user.list
     @app.get '/user/:name', user.create
 
 module.exports = WebServer
