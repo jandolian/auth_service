@@ -25,11 +25,11 @@ class User
     client.smembers User.key(), (err, members) ->
       cb(err, members)
 
-  create: (cb) =>
-    client.sismember User.key(), @username, (err, is_member) ->
-      is_member = is_member > 0
-      cb(err, is_member)
-
+  create: (email, cb) =>
+    client.hmset User.key(@username),
+      "name", @username, "email", email, (err, updated) =>
+        client.sadd User.key(), @username, (err, added) ->
+          cb(err, updated)
       # _.extend({ name: req.params['name'] }, generate_keypair())
 
 module.exports = User
