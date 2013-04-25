@@ -10,3 +10,4 @@ global.config = require 'nconf'
 global.cli = require '../../src/cli'
 
 config.overrides
+  'redis_prefix': '_test_auth_service'

@@ -25,6 +25,11 @@ class CLI
       .alias('p', 'port')
       .describe('p', 'Run the api server on the given port')
       .default('p', 3000)
+      
+      # redis prefix
+      .alias('P', 'redis_prefix')
+      .describe('P', 'The redis key prefix')
+      .default('P', 'auth_service')
 
       # help
       .alias('h', 'help')
