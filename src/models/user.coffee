@@ -1,8 +1,8 @@
-_ = require 'underscore'
 {generate_keypair} = require '../identity'
 
 bcrypt = require 'bcrypt'
 redis = require 'redis'
+config = require 'nconf'
 client = redis.createClient()
 
 class User
@@ -15,7 +15,7 @@ class User
   @return {String} The redis-prefixed key
   ###
   @key: (params...) ->
-    prefix = "demon_killer_users"
+    prefix = [config.get('redis_prefix'), "users"].join('_')
     params.unshift(prefix)
     if params.length > 1
       params.join(':')
@@ -27,14 +27,16 @@ class User
       cb(err, members)
 
   create: (email, password, cb) =>
+    keypair = generate_keypair()
     bcrypt.hash password, 10, (err, hash) =>
       client.hmset User.key(@username),
         "name", @username,
         "email", email,
         "password", hash,
+        "token", keypair.token,
+        "secret", keypair.shared_secret,
         (err, updated) =>
           client.sadd User.key(), @username, (err, added) =>
             cb(err, updated)
-      # _.extend({ name: req.params['name'] }, generate_keypair())
 
 module.exports = User
