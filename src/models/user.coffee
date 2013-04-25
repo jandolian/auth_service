@@ -1,6 +1,7 @@
 _ = require 'underscore'
 {generate_keypair} = require '../identity'
 
+bcrypt = require 'bcrypt'
 redis = require 'redis'
 client = redis.createClient()
 
@@ -25,11 +26,15 @@ class User
     client.smembers User.key(), (err, members) ->
       cb(err, members)
 
-  create: (email, cb) =>
-    client.hmset User.key(@username),
-      "name", @username, "email", email, (err, updated) =>
-        client.sadd User.key(), @username, (err, added) ->
-          cb(err, updated)
+  create: (email, password, cb) =>
+    bcrypt.hash password, 10, (err, hash) =>
+      client.hmset User.key(@username),
+        "name", @username,
+        "email", email,
+        "password", hash,
+        (err, updated) =>
+          client.sadd User.key(), @username, (err, added) =>
+            cb(err, updated)
       # _.extend({ name: req.params['name'] }, generate_keypair())
 
 module.exports = User
