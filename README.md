@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/jandolian/auth_service.png)](http://travis-ci.org/jandolian/auth_service)
 Auth Service
 ============
 
