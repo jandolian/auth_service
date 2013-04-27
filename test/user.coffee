@@ -29,15 +29,20 @@ describe 'User', ->
     user.create user_email, user_password, (err, updated) ->
       assert.ifError err
       client.hgetall ukey, (err, data) ->
+        assert.ifError err
         data.name.should.equal username
         data.email.should.equal user_email
         data.password.length.should.equal 60
-        done()
+        client.sismember users_key, username, (err, ismember) ->
+          assert.ifError err
+          assert.equal(ismember, true)
+          done()
   
   it "should set tokens on user creation", (done) ->
     user.create user_email, user_password, (err, updated) ->
       assert.ifError err
       client.hgetall ukey, (err, data) ->
+        assert.ifError err
         assert.notEqual data.token, null
         assert.notEqual data.token, undefined
         assert.notEqual data.secret, null
@@ -46,7 +51,18 @@ describe 'User', ->
         data.secret.length.should.equal 40
         done()
   
-  it "should be able to delete a user"
+  it "should be able to delete a user", (done) ->
+    user.create user_email, user_password, (err, updated) ->
+      assert.ifError err
+      user.delete (err, success) ->
+        assert.ifError err
+        client.hgetall ukey, (err, data) ->
+          assert.ifError err
+          assert.equal data, null
+          client.sismember users_key, username, (err, ismember) ->
+            assert.ifError err
+            assert.equal ismember, false
+            done()
 
   it "should be able to update a users name"
   

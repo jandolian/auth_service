@@ -39,4 +39,9 @@ class User
           client.sadd User.key(), @username, (err, added) =>
             cb(err, updated)
 
+  delete: (cb) =>
+    client.del User.key(@username), (err, success) =>
+      client.srem User.key(), @username, (err, success) ->
+        cb(err, success)
+
 module.exports = User
