@@ -12,7 +12,10 @@ task 'watch', 'Starts a watcher for the src/*.coffee files', ->
     throw err if err
     console.log stdout + stderr
 
-task "test", "run tests", (options)->
+task 'doc', 'Generates documenation for the project', ->
+  exec "./node_modules/.bin/codo --cautious"
+
+task 'test', 'run tests', (options)->
   options.reporter or= "spec"
   exec "clear; NODE_ENV=test 
     ./node_modules/.bin/mocha 
