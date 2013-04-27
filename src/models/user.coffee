@@ -22,14 +22,31 @@ class User
     else
       params[0]
 
+  ###
+  The list of users.
+  
+  @param {Function} cb The callback function
+  ###
   @list: (cb) ->
     client.smembers User.key(), (err, members) ->
       cb(err, members)
   
+  ###
+  Finds an individual user.
+  
+  @param {String} username The username to search for
+  @param {Function} cb The callback function
+  ###
   @find: (username, cb) ->
     client.hgetall User.key(username), (err, userinfo) ->
       cb(err, userinfo)
-
+  ###
+  Creates a new user and adds them to the set of users.
+  
+  @param {String} email The users email address
+  @param {String} password The users password
+  @param {Function} cb The callback function
+  ###
   create: (email, password, cb) =>
     keypair = generate_keypair()
     bcrypt.hash password, 10, (err, hash) =>
@@ -43,6 +60,11 @@ class User
           client.sadd User.key(), @username, (err, added) =>
             cb(err, updated)
   
+  ###
+  Deletes a user and their information.
+  
+  @param {Function} cb The callback function
+  ###
   delete: (cb) =>
     client.del User.key(@username), (err, success) =>
       client.srem User.key(), @username, (err, success) ->
