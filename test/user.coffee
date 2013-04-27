@@ -1,6 +1,3 @@
-redis = require 'redis'
-client = redis.createClient()
-
 logger = require '../src/logger'
 User = require '../src/models/user'
 
@@ -8,9 +5,6 @@ describe 'User', ->
   username = 'rivenreaver'
   user_email = 'bob@aol.com'
   user_password = 'password1234'
-  
-  users_key = [config.get('redis_prefix'), 'users'].join('_')
-  ukey = [users_key, username].join(':')
   user = null
   
   beforeEach (done) ->
@@ -20,9 +14,7 @@ describe 'User', ->
 
   afterEach (done) ->
     user = null
-    client.keys "#{config.get('redis_prefix')}*", (err, resp) ->
-      for r in resp
-        client.del r
+    User.delete_all (err, success) ->
       done()
   
   it "should be able to create a new user", (done) ->
@@ -33,7 +25,7 @@ describe 'User', ->
         data.name.should.equal username
         data.email.should.equal user_email
         data.password.length.should.equal 60
-        client.sismember users_key, username, (err, ismember) ->
+        User.exists username, (err, ismember) ->
           assert.ifError err
           assert.equal(ismember, true)
           done()
@@ -66,6 +58,14 @@ describe 'User', ->
         userinfo.token.length.should.equal 16
         userinfo.secret.length.should.equal 40
         done()
+        
+  it "should be able to verify if a user exists", (done) ->
+    user.create user_email, user_password, (err, updated) ->
+      assert.ifError err
+      User.exists username, (err, exists) ->
+        assert.ifError err
+        assert.equal(exists, true)
+        done()
   
   it "should be able to delete a user", (done) ->
     user.create user_email, user_password, (err, updated) ->
@@ -75,11 +75,13 @@ describe 'User', ->
         User.find username, (err, data) ->
           assert.ifError err
           assert.equal data, null
-          client.sismember users_key, username, (err, ismember) ->
+          User.exists username, (err, ismember) ->
             assert.ifError err
             assert.equal(ismember, false)
             done()
 
+  it "should be able to delete all users"
+  
   it "should be able to update a users name"
   
   it "should be able to update a users email address"

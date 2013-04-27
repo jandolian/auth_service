@@ -28,8 +28,7 @@ class User
   @param {Function} cb The callback function
   ###
   @list: (cb) ->
-    client.smembers User.key(), (err, members) ->
-      cb(err, members)
+    client.smembers User.key(), cb
   
   ###
   Finds an individual user.
@@ -38,8 +37,28 @@ class User
   @param {Function} cb The callback function
   ###
   @find: (username, cb) ->
-    client.hgetall User.key(username), (err, userinfo) ->
-      cb(err, userinfo)
+    client.hgetall User.key(username), cb
+    
+  ###
+  Verifies whether or not a user exists.
+  
+  @param {String} username The username to verify
+  @param {Function} cb The callback function
+  ###
+  @exists: (username, cb) ->
+    client.sismember User.key(), username, cb
+    
+  ###
+  Deletes all users.
+  
+  @param {Function} cb The callback function
+  ###
+  @delete_all: (cb) ->
+    client.keys "#{User.key()}*", (err, keys) ->
+      for k in keys
+        client.del k
+      cb(err, true)
+    
   ###
   Creates a new user and adds them to the set of users.
   
@@ -57,8 +76,7 @@ class User
         "token", keypair.token,
         "secret", keypair.shared_secret,
         (err, updated) =>
-          client.sadd User.key(), @username, (err, added) =>
-            cb(err, updated)
+          client.sadd User.key(), @username, cb
   
   ###
   Deletes a user and their information.
@@ -67,7 +85,6 @@ class User
   ###
   delete: (cb) =>
     client.del User.key(@username), (err, success) =>
-      client.srem User.key(), @username, (err, success) ->
-        cb(err, success)
+      client.srem User.key(), @username, cb
 
 module.exports = User
