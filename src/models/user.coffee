@@ -25,6 +25,10 @@ class User
   @list: (cb) ->
     client.smembers User.key(), (err, members) ->
       cb(err, members)
+  
+  @find: (username, cb) ->
+    client.hgetall User.key(username), (err, userinfo) ->
+      cb(err, userinfo)
 
   create: (email, password, cb) =>
     keypair = generate_keypair()
@@ -38,7 +42,7 @@ class User
         (err, updated) =>
           client.sadd User.key(), @username, (err, added) =>
             cb(err, updated)
-
+  
   delete: (cb) =>
     client.del User.key(@username), (err, success) =>
       client.srem User.key(), @username, (err, success) ->
