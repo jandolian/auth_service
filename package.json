@@ -28,7 +28,7 @@
   "scripts": {
     "pretest": "cake build",
     "prepublish": "cake build",
-    "test": "cake test"
+    "test": "cake -r dot test"
   },
   "main": "./lib/application"
 }
