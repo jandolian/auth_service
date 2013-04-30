@@ -95,19 +95,26 @@ class User
   
   ###
   ###
-  rename: (cb) ->
+  rename: (cb) =>
+  
+  ###
+  Updates a user's email address.
+  
+  @param {String} email The users email address
+  @param {Function} cb The callback function
+  ###
+  update_email: (email, cb) =>
+    User.find @username, (err, userinfo) ->
+      userinfo.email = email
+      User.set(userinfo, cb)
+      
+  ###
+  ###
+  update_passowrd: (cb) =>
   
   ###
   ###
-  update_email: (cb) ->
-  
-  ###
-  ###
-  update_passowrd: (cb) ->
-  
-  ###
-  ###
-  regenerate_tokens: (cb) ->
+  regenerate_tokens: (cb) =>
   
   ###
   Deletes a user and their information.
