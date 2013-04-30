@@ -60,21 +60,33 @@ class User
       cb(err, true)
 
   ###
-  Forcefully sets up the given userinfo object.
+  Forcefully saves up the given userinfo object.
   
   @param {Object} userinfo The user's info hash
   @param {Function} cb The callback function
   ###
-  @set: (userinfo, cb) =>
+  @save: (userinfo, cb) =>
     client.hmset User.key(userinfo.name),
       "name", userinfo.name,
       "email", userinfo.email,
       "password", userinfo.password,
       "token", userinfo.token,
       "secret", userinfo.secret,
-      (err, updated) =>
-        client.sadd User.key(), userinfo.name, cb
-    
+      (err, hupdated) =>
+        client.sadd User.key(), userinfo.name
+        , (err, supdated) => cb(err, hupdated == 'OK')
+
+  ###
+  Logs in the given user.
+  
+  @param {String} username The user to log in
+  @param {String} password The user password
+  @param {Function} cb The callback function
+  ###
+  @login: (username, password, cb) =>
+    User.find username, (err, userinfo) ->
+      bcrypt.compare password, userinfo.password, cb
+
   ###
   Creates a new user and adds them to the set of users.
   
@@ -91,7 +103,7 @@ class User
       userinfo.password = hash
       userinfo.token = keypair.token
       userinfo.secret = keypair.shared_secret
-      User.set(userinfo, cb)
+      User.save(userinfo, cb)
   
   ###
   ###
@@ -100,17 +112,25 @@ class User
   ###
   Updates a user's email address.
   
-  @param {String} email The users email address
+  @param {String} email The user's email address
   @param {Function} cb The callback function
   ###
   update_email: (email, cb) =>
     User.find @username, (err, userinfo) ->
       userinfo.email = email
-      User.set(userinfo, cb)
+      User.save(userinfo, cb)
       
   ###
+  Updates a user's password.
+  
+  @param {String} password The user's password
+  @param {Function} cb The callback function
   ###
-  update_passowrd: (cb) =>
+  update_password: (password, cb) =>
+    User.find @username, (err, userinfo) ->
+      bcrypt.hash password, 10, (err, hash) =>
+        userinfo.password = hash
+        User.save(userinfo, cb)
   
   ###
   ###

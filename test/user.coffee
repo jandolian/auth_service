@@ -97,9 +97,9 @@ describe 'User', ->
               assert.equal data, null
               done()
   
-  it "should be able to update a users name"
+  it "should be able to update a user's name"
   
-  it "should be able to update a users email address", (done) ->
+  it "should be able to update a user's email address", (done) ->
     user.create user_email, user_password, (err, updated) ->
       assert.ifError err
       user.update_email "coolmail@gmail.com", (err, success) ->
@@ -110,6 +110,15 @@ describe 'User', ->
           assert.equal userinfo.email, "coolmail@gmail.com"
           done()
         
-  it "should be able to update a users password"
+  it "should be able to update a user's password", (done) ->
+    user.create user_email, user_password, (err, updated) ->
+      assert.ifError err
+      user.update_password "catdog2333", (err, success) ->
+        assert.ifError err
+        assert.equal success, true
+        User.login username, "catdog2333", (err, success) ->
+          assert.ifError err
+          assert.equal success, true
+          done()
   
-  it "should be able to update a users token/secret"
+  it "should be able to update a user's token/secret"
