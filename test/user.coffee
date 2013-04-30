@@ -80,7 +80,22 @@ describe 'User', ->
             assert.equal(ismember, false)
             done()
 
-  it "should be able to delete all users"
+  it "should be able to delete all users", (done) ->
+    user.create user_email, user_password, (err, updated) ->
+      assert.ifError err
+      username2 = "bob"
+      user2 = new User(username2)
+      user2.create user_email, user_password, (err, updated) ->
+        assert.ifError err
+        User.delete_all (err, success) ->
+          assert.ifError err
+          User.find username, (err, data) ->
+            assert.ifError err
+            assert.equal data, null
+            User.find username2, (err, data) ->
+              assert.ifError err
+              assert.equal data, null
+              done()
   
   it "should be able to update a users name"
   

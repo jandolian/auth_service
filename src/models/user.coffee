@@ -58,6 +58,22 @@ class User
       for k in keys
         client.del k
       cb(err, true)
+
+  ###
+  Forcefully sets up the given userinfo object.
+  
+  @param {Object} userinfo The user's info hash
+  @param {Function} cb The callback function
+  ###
+  @set: (userinfo, cb) =>
+    client.hmset User.key(userinfo.name),
+      "name", userinfo.name,
+      "email", userinfo.email,
+      "password", userinfo.password,
+      "token", userinfo.token,
+      "secret", userinfo.secret,
+      (err, updated) =>
+        client.sadd User.key(), userinfo.name, cb
     
   ###
   Creates a new user and adds them to the set of users.
@@ -69,14 +85,29 @@ class User
   create: (email, password, cb) =>
     keypair = generate_keypair()
     bcrypt.hash password, 10, (err, hash) =>
-      client.hmset User.key(@username),
-        "name", @username,
-        "email", email,
-        "password", hash,
-        "token", keypair.token,
-        "secret", keypair.shared_secret,
-        (err, updated) =>
-          client.sadd User.key(), @username, cb
+      userinfo = {}
+      userinfo.name = @username
+      userinfo.email = email
+      userinfo.password = hash
+      userinfo.token = keypair.token
+      userinfo.secret = keypair.shared_secret
+      User.set(userinfo, cb)
+  
+  ###
+  ###
+  rename: (cb) ->
+  
+  ###
+  ###
+  update_email: (cb) ->
+  
+  ###
+  ###
+  update_passowrd: (cb) ->
+  
+  ###
+  ###
+  regenerate_tokens: (cb) ->
   
   ###
   Deletes a user and their information.
