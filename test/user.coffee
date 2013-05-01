@@ -121,4 +121,19 @@ describe 'User', ->
           assert.equal success, true
           done()
   
-  it "should be able to update a user's token/secret"
+  it "should be able to update a user's token/secret", (done) ->
+    user.create user_email, user_password, (err, updated) ->
+      assert.ifError err
+      user.regenerate_tokens (err, data) ->
+        assert.ifError err
+        User.find username, (err, userinfo) ->
+          assert.ifError err
+          assert.notEqual userinfo.token, null
+          assert.notEqual userinfo.token, undefined
+          assert.notEqual userinfo.secret, null
+          assert.notEqual userinfo.secret, undefined
+          userinfo.token.length.should.equal 16
+          userinfo.secret.length.should.equal 40
+          done()
+      
+        

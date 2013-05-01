@@ -60,7 +60,7 @@ class User
       cb(err, true)
 
   ###
-  Forcefully saves up the given userinfo object.
+  Forcefully saves the given userinfo object.
   
   @param {Object} userinfo The user's info hash
   @param {Function} cb The callback function
@@ -133,8 +133,16 @@ class User
         User.save(userinfo, cb)
   
   ###
+  Updates a user's token and secret.
+  
+  @param {Function} cb The callback function
   ###
   regenerate_tokens: (cb) =>
+    User.find @username, (err, userinfo) ->
+      keypair = generate_keypair()
+      userinfo.token = keypair.token
+      userinfo.secret = keypair.shared_secret
+      User.save(userinfo, cb)
   
   ###
   Deletes a user and their information.
