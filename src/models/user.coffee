@@ -46,7 +46,8 @@ class User
   @param {Function} cb The callback function
   ###
   @exists: (username, cb) ->
-    client.sismember User.key(), username, cb
+    client.sismember User.key(), username, (err, exists) ->
+      cb(err, exists == 1)
     
   ###
   Deletes all users.
@@ -88,6 +89,28 @@ class User
       bcrypt.compare password, userinfo.password, cb
 
   ###
+  Renames a current user.
+  
+  @param {String} target The origin username
+  @param {String} destination What the origin will be renamed to
+  @param {Function} cb The callback function    
+  ###
+  @rename: (target, destination, cb) ->
+    User.exists target, (err, exists) ->
+      if exists == true
+        User.find target, (err, userinfo) ->
+          User.exists destination, (err, exists2) ->
+            if exists2 == true
+              return cb("Cannot rename destination user exists: #{destination}", false)
+            else
+              userinfo.name = destination
+              User.save userinfo, (err, success) ->
+                user = new User(target)
+                user.delete cb
+      else
+        return cb("Cannot rename target does not exist: #{target}", false)
+
+  ###
   Creates a new user and adds them to the set of users.
   
   @param {String} email The users email address
@@ -104,11 +127,7 @@ class User
       userinfo.token = keypair.token
       userinfo.secret = keypair.shared_secret
       User.save(userinfo, cb)
-  
-  ###
-  ###
-  rename: (cb) =>
-  
+
   ###
   Updates a user's email address.
   

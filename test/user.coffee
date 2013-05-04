@@ -97,7 +97,27 @@ describe 'User', ->
               assert.equal data, null
               done()
   
-  it "should be able to update a user's name"
+  it "should be able to update a user's name", (done) ->
+    user.create user_email, user_password, (err, updated) ->
+      assert.ifError err
+      User.find username, (err, userinfo) ->
+        assert.ifError err
+        assert.notEqual userinfo, null
+        User.rename username, "catdog123", (err, success) ->
+          assert.ifError err
+          assert.equal success, true
+          User.find "catdog123", (err, ruserinfo) ->
+            assert.ifError err
+            assert.notEqual ruserinfo, null
+            assert.equal ruserinfo.name, "catdog123"
+            assert.equal ruserinfo.email, userinfo.email
+            assert.equal ruserinfo.password, userinfo.password
+            assert.equal ruserinfo.token, userinfo.token
+            assert.equal ruserinfo.secret, userinfo.secret
+            User.exists username, (err, exists) ->
+              assert.ifError err
+              assert.equal exists, false
+              done()
   
   it "should be able to update a user's email address", (done) ->
     user.create user_email, user_password, (err, updated) ->
